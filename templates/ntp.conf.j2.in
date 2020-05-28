@@ -1,0 +1,87 @@
+# {{ ntp_cfg_file }}
+# {{ ansible_managed }}
+
+{# pool                                                         #}
+{% if ntp_pools                                                 %}
+# pool
+{%  for _pool in ntp_pools                                      %}
+pool {{ _pool }} {{ ntp_pool_flags | join(' ') }}
+{%  endfor                                                      %}
+{% endif                                                        %}
+{# server                                                       #}
+{% if ntp_servers                                               %}
+# server
+{%  for _server in ntp_servers                                  %}
+server {{ _server }} {{ ntp_server_flags | join(' ') }}
+{%  endfor                                                      %}
+{% endif                                                        %}
+
+# tinker
+tinker panic {{ ntp_tinker_panic }}
+
+# interface
+{% if ntp_interface_ignore                                      %}
+{%  for _ignore in ntp_interface_ignore                         %}
+interface ignore {{ _ignore }}
+{%  endfor                                                      %}
+{% endif                                                        %}
+{% if ntp_interface_listen                                      %}
+{%  for _listen in  ntp_interface_listen                        %}
+interface listen {{ _listen }}
+{%  endfor                                                      %}
+{% endif                                                        %}
+{# loopback                                                     #}
+{% if ntp_interface_listen_loopback                             %}
+{%  if "127.0.0.1" not in ntp_interface_listen                  %}
+interface listen 127.0.0.1
+{%  endif                                                       %}
+{%  if "::1" not in ntp_interface_listen                        %}
+interface listen ::1
+{%  endif                                                       %}
+{% endif                                                        %}
+{# private                                                      #}
+{% if ntp_interface_listen_private                              %}
+{%  if ntp_interface_ipv4                                       %}
+{%    for _ipv4 in ansible_all_ipv4_addresses | ipv4('private') %}
+interface listen {{ _ipv4 }}
+{%    endfor                                                    %}
+{%  endif                                                       %}
+{%  if ntp_interface_ipv6                                       %}
+{%    for _ipv6 in ansible_all_ipv6_addresses | ipv6('private') %}
+interface listen {{ _ipv6 }}
+{%    endfor                                                    %}
+{%  endif                                                       %}
+{% endif                                                        %}
+{# public                                                       #}
+{% if ntp_interface_listen_public                               %}
+{%  if ntp_interface_ipv4                                       %}
+{%    for _ipv4 in ansible_all_ipv4_addresses | ipv4('public')  %}
+interface listen {{ _ipv4 }}
+{%    endfor                                                    %}
+{%  endif                                                       %}
+{%  if ntp_interface_ipv6                                       %}
+{%    for _ipv6 in ansible_all_ipv6_addresses | ipv6('public')  %}
+interface listen {{ _ipv6 }}
+{%    endfor                                                    %}
+{%  endif                                                       %}
+{% endif                                                        %}
+
+# restrict
+{% if ntp_restrict_default                                      %}
+restrict default {{ ntp_restrict_default | join(' ') }}
+{% endif                                                        %}
+{% if ntp_restrict_source                                       %}
+restrict source {{ ntp_restrict_source | join(' ') }}
+{% endif                                                        %}
+restrict 127.0.0.1
+restrict ::1
+
+{# distribution                                                 #}
+{% if ntp_cfg_distribution                                      %}
+{%  for _dist in ntp_cfg_distribution                           %}
+{{ _dist }}
+{%  endfor                                                      %}
+{% endif                                                        %}
+
+# vim: set sw=2 ts=2 et :
+# eof

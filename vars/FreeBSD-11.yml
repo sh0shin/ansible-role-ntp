@@ -1,0 +1,12 @@
+---
+
+ntp_group: "wheel"
+
+ntp_rc_ntpd_flags: "-p /var/run/ntpd.pid -x"
+
+ntp_cfg_distribution:
+  - 'driftfile "/var/db/ntpd.drift"'
+  - 'leapfile "/var/db/ntpd.leap-seconds.list"'
+
+# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# eof

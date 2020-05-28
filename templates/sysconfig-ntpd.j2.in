@@ -1,0 +1,7 @@
+# {{ ntp_rc_ntpd_redhat_file }}
+# {{ ansible_managed }}
+
+OPTIONS="{{ ntp_rc_ntpd_options }}"
+
+# vim: set sw=2 ts=2 et :
+# eof

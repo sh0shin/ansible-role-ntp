@@ -1,0 +1,241 @@
+---
+
+# forced os variables
+- name: forced os variables
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ ansible_distribution }}-{{ ansible_machine | default("none") }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_release | default(0) }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version | default(0) }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version | default(0) }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - 'main.yml'
+      paths:
+        - 'vars'
+  when: ntp_enabled
+        and ansible_os_family | string in ntp_os_family_supported
+  tags: [ ntp ]
+
+# packages
+- name: packages (freebsd)
+  pkgng:
+    name: '{{ ntp_packages_freebsd | default([]) }}'
+    state: '{{ ntp_packages_freebsd_state | default("latest") }}'
+    cached: '{{ ntp_packages_freebsd_cached | default(false) }}'
+  when: ntp_enabled
+        and ansible_os_family | string in ntp_os_family_supported
+        and ansible_os_family == 'FreeBSD'
+  tags: [ ntp ]
+
+- name: packages (redhat)
+  yum:
+    name: '{{ ntp_packages_redhat | default([]) }}'
+    state: '{{ ntp_packages_redhat_state | default("latest") }}'
+    update_cache: '{{ ntp_packages_redhat_update_cache | default(true) }}'
+  when: ntp_enabled
+        and ansible_os_family | string in ntp_os_family_supported
+        and ansible_os_family == 'RedHat'
+  tags: [ ntp ]
+
+# rc
+- name: freebsd rc.conf.d ntpd (template)
+  template:
+    dest: '{{ ntp_rc_ntpd_freebsd_file }}'
+    src: "{{ lookup('first_found', params) }}"
+    #
+    mode: '{{ ntp_rc_ntpd_freebsd_file_mode | default(ntp_file_mode) }}'
+    owner: '{{ ntp_rc_ntpd_freebsd_file_owner | default(ntp_owner) }}'
+    group: '{{ ntp_rc_ntpd_freebsd_file_group | default(ntp_group) }}'
+    backup: '{{ ntp_rc_ntpd_freebsd_file_backup | default(ntp_backup) }}'
+    validate: '{{ ntp_rc_ntpd_freebsd_file_validate | default(omit) }}'
+  vars:
+    tpl_default: "rc.conf.d-ntpd"
+    tpl_presence: '{{ ntp_rc_ntpd_freebsd_file_template | default(tpl_default) }}'
+    params:
+      files:
+        - '{{ tpl_presence }}.{{ inventory_hostname }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_major_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_os_family }}.j2'
+        - '{{ tpl_presence }}.j2'
+        - '{{ tpl_presence }}.j2.in' # role default
+      paths:
+        - 'templates'
+  notify:
+    - restart_ntpd
+  when: ntp_enabled
+        and ansible_os_family | string in ntp_os_family_supported
+        and ansible_os_family == 'FreeBSD'
+  tags: [ ntp ]
+
+- name: freebsd rc.conf.d ntpdate (template)
+  template:
+    dest: '{{ ntp_rc_ntpdate_freebsd_file }}'
+    src: "{{ lookup('first_found', params) }}"
+    #
+    mode: '{{ ntp_rc_ntpdate_freebsd_file_mode | default(ntp_file_mode) }}'
+    owner: '{{ ntp_rc_ntpdate_freebsd_file_owner | default(ntp_owner) }}'
+    group: '{{ ntp_rc_ntpdate_freebsd_file_group | default(ntp_group) }}'
+    backup: '{{ ntp_rc_ntpdate_freebsd_file_backup | default(ntp_backup) }}'
+    validate: '{{ ntp_rc_ntpdate_freebsd_file_validate | default(omit) }}'
+  vars:
+    tpl_default: "rc.conf.d-ntpdate"
+    tpl_presence: '{{ ntp_rc_ntpdate_freebsd_file_template | default(tpl_default) }}'
+    params:
+      files:
+        - '{{ tpl_presence }}.{{ inventory_hostname }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_major_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_os_family }}.j2'
+        - '{{ tpl_presence }}.j2'
+        - '{{ tpl_presence }}.j2.in' # role default
+      paths:
+        - 'templates'
+  notify:
+    - restart_ntpdate
+  when: ntp_enabled
+        and ansible_os_family | string in ntp_os_family_supported
+        and ansible_os_family == 'FreeBSD'
+  tags: [ ntp ]
+
+- name: redhat sysconfig ntpd (template)
+  template:
+    dest: '{{ ntp_rc_ntpd_redhat_file }}'
+    src: "{{ lookup('first_found', params) }}"
+    #
+    mode: '{{ ntp_rc_ntpd_redhat_file_mode | default(ntp_file_mode) }}'
+    owner: '{{ ntp_rc_ntpd_redhat_file_owner | default(ntp_owner) }}'
+    group: '{{ ntp_rc_ntpd_redhat_file_group | default(ntp_group) }}'
+    backup: '{{ ntp_rc_ntpd_redhat_file_backup | default(ntp_backup) }}'
+    validate: '{{ ntp_rc_ntpd_redhat_file_validate | default(omit) }}'
+  vars:
+    tpl_default: "sysconfig-ntpd"
+    tpl_presence: '{{ ntp_rc_ntpd_redhat_file_template | default(tpl_default) }}'
+    params:
+      files:
+        - '{{ tpl_presence }}.{{ inventory_hostname }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_major_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_os_family }}.j2'
+        - '{{ tpl_presence }}.j2'
+        - '{{ tpl_presence }}.j2.in' # role default
+      paths:
+        - 'templates'
+  notify:
+    - restart_ntpd
+  when: ntp_enabled
+        and ansible_os_family | string in ntp_os_family_supported
+        and ansible_os_family == 'RedHat'
+  tags: [ ntp ]
+
+- name: redhat sysconfig ntpdate (template)
+  template:
+    dest: '{{ ntp_rc_ntpdate_redhat_file }}'
+    src: "{{ lookup('first_found', params) }}"
+    #
+    mode: '{{ ntp_rc_ntpdate_redhat_file_mode | default(ntp_file_mode) }}'
+    owner: '{{ ntp_rc_ntpdate_redhat_file_owner | default(ntp_owner) }}'
+    group: '{{ ntp_rc_ntpdate_redhat_file_group | default(ntp_group) }}'
+    backup: '{{ ntp_rc_ntpdate_redhat_file_backup | default(ntp_backup) }}'
+    validate: '{{ ntp_rc_ntpdate_redhat_file_validate | default(omit) }}'
+  vars:
+    tpl_default: "sysconfig-ntpdate"
+    tpl_presence: '{{ ntp_rc_ntpdate_redhat_file_template | default(tpl_default) }}'
+    params:
+      files:
+        - '{{ tpl_presence }}.{{ inventory_hostname }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_major_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_os_family }}.j2'
+        - '{{ tpl_presence }}.j2'
+        - '{{ tpl_presence }}.j2.in' # role default
+      paths:
+        - 'templates'
+  notify:
+    - restart_ntpdate
+  when: ntp_enabled
+        and ansible_os_family | string in ntp_os_family_supported
+        and ansible_os_family == 'RedHat'
+  tags: [ ntp ]
+
+# service
+- name: ntpd service (systemd)
+  service:
+    name: '{{ ntp_ntpd_service }}'
+    enabled: '{{ ntp_rc_ntpd_enable }}'
+  when: ntp_enabled
+        and ansible_os_family | string in ntp_os_family_supported
+        and ansible_service_mgr == 'systemd'
+  tags: [ ntp ]
+
+- name: ntpdate service (systemd)
+  service:
+    name: '{{ ntp_ntpdate_service }}'
+    enabled: '{{ ntp_rc_ntpdate_enable }}'
+  when: ntp_enabled
+        and ansible_os_family | string in ntp_os_family_supported
+        and ansible_service_mgr == 'systemd'
+  tags: [ ntp ]
+
+# selinux
+# semanage port -a -t ssh_port_t -p tcp #PORTNUMBER
+# firewalld
+
+# config
+# ntpd
+- name: ntpd config (template)
+  template:
+    dest: '{{ ntp_cfg_file }}'
+    src: "{{ lookup('first_found', params) }}"
+    #
+    mode: '{{ ntp_cfg_file_mode | default(ntp_file_mode) }}'
+    owner: '{{ ntp_cfg_file_owner | default(ntp_owner) }}'
+    group: '{{ ntp_cfg_file_group | default(ntp_group) }}'
+    backup: '{{ ntp_cfg_file_backup | default(ntp_backup) }}'
+    validate: '{{ ntp_cfg_file_validate | default(omit) }}'
+  vars:
+    tpl_default: '{{ ntp_cfg_file | basename }}'
+    tpl_presence: '{{ ntp_cfg_file_template | default(tpl_default) }}'
+    params:
+      files:
+        - '{{ tpl_presence }}.{{ inventory_hostname }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_major_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_os_family }}.j2'
+        - '{{ tpl_presence }}.j2'
+        - '{{ tpl_presence }}.j2.in' # role default
+      paths:
+        - 'templates'
+  notify:
+    - restart_ntpd
+  when: ntp_enabled
+        and ansible_os_family | string in ntp_os_family_supported
+  tags: [ ntp ]
+
+- name: ntpd config (freebsd-update.conf IgnorePaths)
+  lineinfile:
+    path: '{{ ntp_freebsd_update_cfg_file }}'
+    line: 'IgnorePaths {{ ntp_cfg_file }}'
+    regex: '^IgnorePaths {{ ntp_cfg_file }}'
+    insertafter: '^IgnorePaths.*$'
+    state: present
+    backup: yes
+  when: ntp_enabled
+        and ansible_os_family | string in ntp_os_family_supported
+        and ansible_os_family == 'FreeBSD'
+  tags: [ ntp ]
+
+# flush
+- name: flush handlers
+  meta: flush_handlers
+
+# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# eof

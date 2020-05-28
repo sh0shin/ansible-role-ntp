@@ -1,0 +1,7 @@
+---
+
+ntp_cfg_distribution:
+  - "driftfile /var/lib/ntp/drift"
+
+# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# eof

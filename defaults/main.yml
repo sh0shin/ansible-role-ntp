@@ -1,0 +1,115 @@
+---
+
+# enabled
+ntp_enabled: no
+
+# mode/owner/group/backup defaults
+ntp_file_mode: "0444"
+ntp_dir_mode: "0755"
+ntp_owner: "root"
+ntp_group: "root"
+ntp_backup: yes
+
+# packages
+ntp_packages_freebsd: [] # using base ntp
+ntp_packages_redhat: # RedHat/CentOS
+  - ntp
+  - ntpdate
+
+ntp_ntpd_service: "ntpd"
+ntp_ntpdate_service: "ntpdate"
+
+# rc
+ntp_rc_ntpd_freebsd_file: "/etc/rc.conf.d/ntpd"
+ntp_rc_ntpdate_freebsd_file: "/etc/rc.conf.d/ntpdate"
+
+ntp_rc_ntpd_redhat_file: "/etc/sysconfig/ntpd"
+ntp_rc_ntpdate_redhat_file: "/etc/sysconfig/ntpdate"
+
+ntp_rc_ntpd_enable: yes
+ntp_rc_ntpdate_enable: yes
+
+# freebsd
+ntp_rc_ntpd_flags: "-x"
+ntp_rc_ntpd_sync_on_start: yes # sets -g flag
+ntp_rc_ntpdate_flags: "-b -u -p 2"
+
+# redhat/centos
+ntp_rc_ntpd_options: "-g -x"
+ntp_rc_ntpdate_options: "-b -u -p 2"
+ntp_rc_ntpdate_sync_hwclock: yes
+
+# misc
+ntp_freebsd_update_cfg_file: "/etc/freebsd-update.conf"
+
+# config
+ntp_cfg_root: "/etc"
+
+# ntp config
+ntp_cfg_file: "{{ ntp_cfg_root }}/ntp.conf"
+#ntp_cfg_file_validate: "ntpd -t -f %s"
+
+ntp_pools: []
+#  - "time.google.com"
+
+ntp_pool_flags:
+  - "iburst"
+
+ntp_servers:
+  # time.google.com
+  #- "216.239.35.0"
+  #- "216.239.35.4"
+  #- "216.239.35.8"
+  #- "216.239.35.12"
+  #- "2001:4860:4806::"
+  #- "2001:4860:4806:4::"
+  #- "2001:4860:4806:8::"
+  #- "2001:4860:4806:c::"
+  - "time1.google.com"
+  - "time2.google.com"
+  - "time3.google.com"
+  - "time4.google.com"
+
+ntp_server_flags:
+  - "iburst"
+
+ntp_interface_ignore:
+  - "wildcard"
+
+ntp_interface_ipv4: yes
+ntp_interface_ipv6: yes
+
+ntp_interface_listen: []
+ntp_interface_listen_loopback: yes
+ntp_interface_listen_private: no
+ntp_interface_listen_public: no
+
+ntp_tinker_panic: 0
+
+ntp_restrict_default:
+  - "limited"
+  - "kod"
+  - "nomodify"
+  - "notrap"
+  - "noquery"
+  - "nopeer"
+
+ntp_restrict_source:
+  - "limited"
+  - "kod"
+  - "nomodify"
+  - "notrap"
+  - "noquery"
+
+ntp_cfg: {}
+ntp_cfg_defaults:
+  - "tinker panic 0"
+  - "restrict default limited kod nomodify notrap noquery nopeer"
+  - "restrict source limited kod nomodify notrap noquery"
+  - "restrict 127.0.0.1"
+  - "restrict ::1"
+
+ntp_cfg_distribution: {}
+
+# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# eof

@@ -1,0 +1,9 @@
+# {{ ntp_rc_ntpd_freebsd_file }}
+# {{ ansible_managed }}
+
+ntpd_enable="{% if ntp_rc_ntpd_enable is sameas true %}YES{% else %}NO{% endif %}"
+ntpd_flags="{% if ntp_rc_ntpd_flags %}{{ ntp_rc_ntpd_flags }}{% endif %}"
+ntpd_sync_on_start="{% if ntp_rc_ntpd_sync_on_start is sameas true %}YES{% else %}NO{% endif %}"
+
+# vim: set sw=2 ts=2 et :
+# eof

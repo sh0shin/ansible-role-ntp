@@ -1,0 +1,14 @@
+---
+
+- name: restart_ntpd
+  service:
+    name: '{{ ntp_ntpd_service }}'
+    state: restarted
+
+- name: restart_ntpdate
+  service:
+    name: '{{ ntp_ntpdate_service }}'
+    state: restarted
+
+# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# eof

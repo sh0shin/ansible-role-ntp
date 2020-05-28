@@ -1,0 +1,8 @@
+# {{ ntp_rc_ntpd_redhat_file }}
+# {{ ansible_managed }}
+
+OPTIONS="{{ ntp_rc_ntpdate_options }}"
+SYNC_HWCLOCK="{% if ntp_rc_ntpdate_sync_hwclock is sameas true %}yes{% else %}no{% endif %}"
+
+# vim: set sw=2 ts=2 et :
+# eof

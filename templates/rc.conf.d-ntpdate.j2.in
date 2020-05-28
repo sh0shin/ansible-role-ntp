@@ -1,0 +1,8 @@
+# {{ ntp_rc_ntpdate_freebsd_file }}
+# {{ ansible_managed }}
+
+ntpdate_enable="{% if ntp_rc_ntpdate_enable is sameas true %}YES{% else %}NO{% endif %}"
+ntpdate_flags="{% if ntp_rc_ntpdate_flags %}{{ ntp_rc_ntpdate_flags }}{% endif %}"
+
+# vim: set sw=2 ts=2 et :
+# eof
