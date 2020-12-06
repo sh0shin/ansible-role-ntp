@@ -8,5 +8,5 @@ ntp_cfg_distribution:
   - 'driftfile "/var/db/ntpd.drift"'
   - 'leapfile "/var/db/ntpd.leap-seconds.list"'
 
-# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# vim: set ft=yaml.ansible sw=2 ts=2 et colorcolumn=160 :
 # eof
